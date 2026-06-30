@@ -119,19 +119,20 @@ class HeartsteelController {
   private readonly chargeProcess: HeartsteelChargeProcess;
 
   private readonly triggerGrantBonusHPBase = 12.5;
-  private readonly triggerGrantBonusHPPercentageMaxHP = 0.01 * 0.6;
+  private readonly triggerGrantBonusHPPercentageMaxHP = 0.006;
 
   private activeAudio: HTMLAudioElement | undefined = undefined;
 
   readonly itemBaseHP = 800;
   readonly itemBonusHP = ref(0);
+  readonly itemBonusHPReal = ref(0);
   readonly currentChargeStack = ref(0);
 
   constructor(heroMaxHP: Ref<number>) {
     this.heroMaxHP = readonly(heroMaxHP);
 
     this.chargeProcess = new HeartsteelChargeProcess();
-    this.chargeProcess.isDebugging = true;
+    this.chargeProcess.isDebugging = false;
     this.chargeProcess.onStackCountChange = (n: number) => {
       this.currentChargeStack.value = n;
     };
@@ -153,8 +154,13 @@ class HeartsteelController {
     playSoundWithSettings(audioEl).catch((e) => {
       console.error(e);
     });
-    // grant bonus hp
-    this.itemBonusHP.value += this.triggerGrantBonusHPBase;
+    // grant bonus hp    
+    this.itemBonusHPReal.value += this.triggerGrantBonusHP;
+    if (this.itemBonusHPReal.value > 333) {
+      this.itemBonusHP.value = this.itemBonusHPReal.value * 3;
+    }else {
+      this.itemBonusHP.value = this.itemBonusHPReal.value;
+    }
     // restart heartsteel charge process
     this.chargeProcess.reset();
     this.chargeProcess.start();
@@ -166,6 +172,11 @@ class HeartsteelController {
   }
 
   get triggerGrantBonusHP(): number {
+    console.debug("HeartsteelController::triggerGrantBonusHP", {
+      result:
+        this.triggerGrantBonusHPBase +
+        this.heroMaxHP.value * this.triggerGrantBonusHPPercentageMaxHP,
+    });
     return (
       this.triggerGrantBonusHPBase +
       this.heroMaxHP.value * this.triggerGrantBonusHPPercentageMaxHP

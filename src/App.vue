@@ -27,6 +27,14 @@ const play = () => {
   ctrl.start();
 };
 
+const auto = () => {
+  setInterval(() => {
+    if (isPlaying.value) {
+      ctrl.doAttack();
+    }
+  }, 3100);
+};
+
 provide("main-controller", ctrl);
 
 document.addEventListener("keypress", (event) => {
@@ -46,6 +54,7 @@ document.addEventListener("keypress", (event) => {
         :is-bought="isPlaying"
         :progress="0"
         :stack-count="ctrl.heartsteel.itemBonusHP.value"
+        @click="auto"
       />
       <!-- Introduce -->
       <span class="passive-text">
