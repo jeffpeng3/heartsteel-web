@@ -32,7 +32,7 @@ const auto = () => {
     if (isPlaying.value) {
       ctrl.doAttack();
     }
-  }, 3100);
+  }, 3300);
 };
 
 provide("main-controller", ctrl);
